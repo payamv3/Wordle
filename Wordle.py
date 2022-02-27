@@ -25,7 +25,7 @@ df['Number of Tries'] = df['Number of Tries'].astype('int32')
 
 st.sidebar.header("My Journey with Wordle")
 st.sidebar.markdown("""In an attempt to take control of my personally generated data, I have been documenting the way I go about guessing on Wordle.""")
-st.sidebar.markdown("""A small project by Payam Saeedi""")
+st.sidebar.markdown("""A Small Project by Payam Saeedi""")
 
 
 def frequency(string):
