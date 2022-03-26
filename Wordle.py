@@ -11,7 +11,7 @@ import sys
 import time
 
 df = pd.read_csv("Wordle.csv")
-df.drop(columns = {"Unnamed: 3","Unnamed: 4","Unnamed: 5","Unnamed: 6"}, inplace = True)
+#df.drop(columns = {"Unnamed: 3","Unnamed: 4","Unnamed: 5","Unnamed: 6"}, inplace = True)
 df.head()
 
 opener = df['Opening Word'].to_list()
