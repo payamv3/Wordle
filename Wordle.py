@@ -60,7 +60,7 @@ wod_df = wod_df.rename(columns = {0:"Letter",1:"Count"})
 
 
 bars1 = alt.Chart(opener_df).mark_bar(cornerRadiusTopLeft=3,
-    cornerRadiusTopRight=3, size = 30, stroke = 'transparent', strokeOpacity = 0).encode(
+    cornerRadiusTopRight=3, size = 30).encode(
     alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=12, tickSize=0, labelPadding=10)),
     alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
     # The highlight will be set on the result of a conditional statement
@@ -79,12 +79,12 @@ text1 = bars1.mark_text(
 )
 
 
-st.altair_chart(bars1 + text1, use_container_width = True)
+st.altair_chart((bars1 + text1).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
 
 
 
 bars2 = alt.Chart(wod_df).mark_bar(cornerRadiusTopLeft=3,
-    cornerRadiusTopRight=3, size = 30, stroke = 'transparent', strokeOpacity = 0).encode(
+    cornerRadiusTopRight=3, size = 30).encode(
     alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=12, tickSize=0, labelPadding=10)),
     alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
     # The highlight will be set on the result of a conditional statement
@@ -103,4 +103,4 @@ text2 = bars2.mark_text(
 )
 
 
-st.altair_chart(bars2 + text2, use_container_width = True)
+st.altair_chart((bars2 + text2).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
