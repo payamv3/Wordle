@@ -11,8 +11,22 @@ import sys
 import time
 
 df = pd.read_csv("Wordle.csv")
+df["Common Letters"] = df.apply(
+    lambda x: len(set(x["Opening Word"]).intersection(set(x["Word of the Day"]))),
+    axis=1)
 #df.drop(columns = {"Unnamed: 3","Unnamed: 4","Unnamed: 5","Unnamed: 6"}, inplace = True)
-df.head()
+
+def correct_guesses(string1,string2):
+    count = 0
+    string1 = list(string1)
+    string2 = list(string2)
+    #return string1,string2
+    for index in range(0,5):
+        if string1[index] == string2[index]:
+            count +=1
+    return count
+
+df['Correct Guesses'] = df.apply(lambda x: correct_guesses(x["Opening Word"],x["Word of the Day"]) , axis = 1)
 
 opener = df['Opening Word'].to_list()
 wod = df['Word of the Day'].to_list()
@@ -21,11 +35,11 @@ opener = ''.join(opener).lower()
 wod = ''.join(wod).lower()
 
 df.loc[df['Number of Tries'] == "Lost", ['Number of Tries']] = 0
-df['Number of Tries'] = df['Number of Tries'].astype('int32')
+df['Number of Tries'] = df['Number of Tries'].astype('int8')
 
 st.sidebar.header("My Journey with Wordle")
 st.sidebar.markdown("""In an attempt to take control of my personally generated data, I have been documenting the way I go about guessing on Wordle.""")
-st.sidebar.markdown("""A Small Project by Payam Saeedi""")
+st.sidebar.markdown("""A small project by Payam Saeedi""")
 
 
 def frequency(string):
@@ -43,25 +57,25 @@ def keywithmaxval(frequency):
     return k[v.index(max(v))]
 
 col1,col2 = st.columns(2)
-col1.metric(label="Most Repeated Letter in my First Guess", value=keywithmaxval(frequency(opener)))
+col1.metric(label="The number of guesses it most often takes me", value=df['Number of Tries'].mean().round())
 col2.metric(label="Most Repeated Letter in the Final Answer", value=keywithmaxval(frequency(wod)))
 
 opener_items = frequency(opener).items()
 opener_list = list(opener_items)
 
 opener_df = pd.DataFrame(opener_list)
-opener_df = opener_df.rename(columns = {0:"Letter",1:"Count"})
+opener_df = opener_df.rename(columns = {0:"Letter",1:"Count"}).sort_values(by = 'Count', ascending = False).head()
 
 wod_items = frequency(wod).items()
 wod_list = list(wod_items)
 
 wod_df = pd.DataFrame(wod_list)
-wod_df = wod_df.rename(columns = {0:"Letter",1:"Count"})
+wod_df = wod_df.rename(columns = {0:"Letter",1:"Count"}).sort_values(by = 'Count', ascending = False).head()
 
 
 bars1 = alt.Chart(opener_df).mark_bar(cornerRadiusTopLeft=3,
-    cornerRadiusTopRight=3, size = 30).encode(
-    alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=12, tickSize=0, labelPadding=10)),
+    cornerRadiusTopRight=3, size = 40).encode(
+    alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
     alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
     # The highlight will be set on the result of a conditional statement
     color=alt.condition(
@@ -69,7 +83,7 @@ bars1 = alt.Chart(opener_df).mark_bar(cornerRadiusTopLeft=3,
         alt.value('gold'),     # which sets the bar orange.
         alt.value('grey')   # And if it's not true it sets the bar steelblue.
     )
-).properties(title = 'Frequency of Letters in my Opener', width = 800, height = 400)
+).properties(title = 'Top 5 Letters in my Opener', width = 300, height = 400)
 
 text1 = bars1.mark_text(
     align='center',
@@ -79,12 +93,12 @@ text1 = bars1.mark_text(
 )
 
 
-st.altair_chart((bars1 + text1).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
+#st.altair_chart((bars1 + text1).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
 
 
 
 bars2 = alt.Chart(wod_df).mark_bar(cornerRadiusTopLeft=3,
-    cornerRadiusTopRight=3, size = 30).encode(
+    cornerRadiusTopRight=3, size = 40).encode(
     alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=12, tickSize=0, labelPadding=10)),
     alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
     # The highlight will be set on the result of a conditional statement
@@ -93,7 +107,7 @@ bars2 = alt.Chart(wod_df).mark_bar(cornerRadiusTopLeft=3,
         alt.value('gold'),     # which sets the bar orange.
         alt.value('grey')   # And if it's not true it sets the bar steelblue.
     )
-).properties(title = 'Frequency of Letters in Word of the Day', width = 800, height = 400)
+).properties(title = 'Top 5 Letters in Word of the Day', width = 300, height = 400)
 
 text2 = bars2.mark_text(
     align='center',
@@ -103,4 +117,13 @@ text2 = bars2.mark_text(
 )
 
 
-st.altair_chart((bars2 + text2).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
+#st.altair_chart((bars2 + text2).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
+st.altair_chart(((bars1 + text1) | (bars2 + text2)).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
+
+
+heatmap = alt.Chart(df).mark_rect().encode(
+    alt.X('Number of Tries:O',axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
+    alt.Y('Correct Guesses:O',axis=alt.Axis(title='Correct Guesses on The First Try',grid = False, labelFontSize=14, tickSize=0, labelPadding=10)),
+    alt.Color('count():Q', scale=alt.Scale(scheme='darkgold'))).properties(title = 'Correlation Between How Many Words I Get Right The First Time and The Number of Tries', width = 300, height = 400)
+
+st.altair_chart((heatmap).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
