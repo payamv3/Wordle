@@ -57,7 +57,7 @@ def keywithmaxval(frequency):
     return k[v.index(max(v))]
 
 col1,col2 = st.columns(2)
-col1.metric(label="The number of guesses it most often takes me", value=df['Number of Tries'].mean().round())
+col1.metric(label="The number of guesses it usually takes me", value=df['Number of Tries'].mean().round())
 col2.metric(label="Most Repeated Letter in the Final Answer", value=keywithmaxval(frequency(wod)))
 
 opener_items = frequency(opener).items()
@@ -76,7 +76,7 @@ wod_df = wod_df.rename(columns = {0:"Letter",1:"Count"}).sort_values(by = 'Count
 bars1 = alt.Chart(opener_df).mark_bar(cornerRadiusTopLeft=3,
     cornerRadiusTopRight=3, size = 40).encode(
     alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
-    alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
+    alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False, tickSize = 0)),
     # The highlight will be set on the result of a conditional statement
     color=alt.condition(
         alt.datum.Count >= max(frequency(opener).values()),  # If the year is 1810 this test returns True,
@@ -100,7 +100,7 @@ text1 = bars1.mark_text(
 bars2 = alt.Chart(wod_df).mark_bar(cornerRadiusTopLeft=3,
     cornerRadiusTopRight=3, size = 40).encode(
     alt.X('Letter:O', axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=12, tickSize=0, labelPadding=10)),
-    alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False)),
+    alt.Y('Count:Q', axis=alt.Axis(title='Count', labels = False, grid=False, tickSize = 0)),
     # The highlight will be set on the result of a conditional statement
     color=alt.condition(
         alt.datum.Count >= max(frequency(wod).values()),  # If the year is 1810 this test returns True,
@@ -122,8 +122,39 @@ st.altair_chart(((bars1 + text1) | (bars2 + text2)).configure_view(stroke = 'tra
 
 
 heatmap = alt.Chart(df).mark_rect().encode(
-    alt.X('Number of Tries:O',axis = alt.Axis(grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
-    alt.Y('Correct Guesses:O',axis=alt.Axis(title='Correct Guesses on The First Try',grid = False, labelFontSize=14, tickSize=0, labelPadding=10)),
-    alt.Color('count():Q', scale=alt.Scale(scheme='darkgold'))).properties(title = 'Correlation Between How Many Words I Get Right The First Time and The Number of Tries', width = 300, height = 400)
+    alt.X('Number of Tries:O',axis = alt.Axis(grid = False, labelFontSize=14, tickSize=0, labelPadding=10)),
+    alt.Y('Correct Guesses:O',axis=alt.Axis(title='Correct Guesses on The First Try',grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
+    alt.Color('count():Q', scale=alt.Scale(scheme='darkgold'), legend = None)).properties(title = 'Correlation Between How Many Words I Get Right The First Time and The Number of Tries', width = 300, height = 400)
 
 st.altair_chart((heatmap).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
+
+
+histogram1 = alt.Chart(df).mark_bar(cornerRadiusTopRight=3,cornerRadiusBottomRight=3,size = 40).encode(
+    alt.X('count():Q', axis = alt.Axis(title = None, labels = False, grid = False, tickSize=0, labelPadding = 10)),
+    alt.Y('Common Letters:O', axis = alt.Axis(title = None, grid = False, labelFontSize = 14, tickSize = 0, labelPadding = 10)),
+    color = alt.value('gold')
+).properties(title = 'How many letters did my first guess have in common with the word of the day?',width = 300, height = 200)
+
+text3 = histogram1.mark_text(
+    align='center',
+    baseline='middle' , dx= 10, dy = 0
+).encode(
+    text='count():Q'
+)
+
+histogram2 = alt.Chart(df).mark_bar(cornerRadiusTopRight=3,cornerRadiusBottomRight=3,size = 40).encode(
+    alt.X('count():Q', axis = alt.Axis(title = None, labels = False, grid = False, tickSize=0, labelPadding = 10)),
+    alt.Y('Correct Guesses:O', axis = alt.Axis(title = None, grid = False, labelFontSize = 14, tickSize = 0, labelPadding = 10)),
+    color = alt.value('gold')
+).properties(title = 'How many letters did I get right in my first guess?',width = 300, height = 200)
+
+
+text4 = histogram2.mark_text(
+    align='center',
+    baseline='middle' , dx= 10, dy = 0
+).encode(
+    text='count():Q'
+)
+
+
+st.altair_chart(((histogram1 + text3) | (histogram2 + text4)).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
