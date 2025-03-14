@@ -123,8 +123,8 @@ st.altair_chart(((bars1 + text1) | (bars2 + text2)).configure_view(stroke = 'tra
 
 heatmap = alt.Chart(df).mark_rect().encode(
     alt.X('Number of Tries:O',axis = alt.Axis(grid = False,  labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
-    alt.Y('Correct Guesses:O',axis=alt.Axis(title='Correct Guesses on The First Try',grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
-    alt.Color('count():Q', scale=alt.Scale(scheme='bluepurple'), legend = None)).properties(title = 'Correlation Between How Many Words I Get Right The First Time and The Number of Tries', width = 300, height = 400)
+    alt.Y('Correct Guesses:O',axis=alt.Axis(title='Correct Letters Guessed on The First Try',grid = False, labelAngle=0, labelFontSize=14, tickSize=0, labelPadding=10)),
+    alt.Color('count():Q', scale=alt.Scale(scheme='bluepurple'), legend = None)).properties(title = 'Correlation Between How Many Letters I Get Right The First Time and The Number of Tries', width = 300, height = 400)
 
 st.altair_chart((heatmap).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
 
