@@ -129,7 +129,7 @@ heatmap = alt.Chart(df).mark_rect().encode(
 st.altair_chart((heatmap).configure_view(stroke = 'transparent', strokeOpacity = 0), use_container_width = True)
 
 
-histogram1 = alt.Chart(df).mark_bar(cornerRadiusTopRight=3,cornerRadiusBottomRight=3,size = 35).encode(
+histogram1 = alt.Chart(df).mark_bar(cornerRadiusTopRight=3,cornerRadiusBottomRight=3,size = 30).encode(
     alt.X('count():Q', axis = alt.Axis(title = None, labels = False, grid = False, tickSize=0, labelPadding = 10)),
     alt.Y('Common Letters:O', axis = alt.Axis(title = None, grid = False, labelFontSize = 14, tickSize = 0, labelPadding = 10)),
     color = alt.value('darkviolet')
